@@ -5,6 +5,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import by.itacademy.levaniuk.entity.Book;
 import by.itacademy.levaniuk.exception.BookListNotSuportedOperation;
 
 public class BookLinkedList<E> implements Deque<E>{
@@ -483,6 +484,81 @@ public class BookLinkedList<E> implements Deque<E>{
 	@Override
 	public Iterator descendingIterator() {
 		throw new BookListNotSuportedOperation();
+	}
+	
+	public void sortingByYearPublishing() {
+		Node<E> current = firstNode;
+		int minYear = ((Book) current.getElement()).getYearPublishing();
+		do {
+			if(((Book) current.getElement()).getYearPublishing()<minYear) {
+				removeFirstOccurrence(current.getElement());
+				push((E) current.getElement());
+				minYear = ((Book) current.getElement()).getYearPublishing();
+				if(current.getLinkNextElement() == null) {
+					return;
+				}
+			}
+			current = new Node<E>(current.getLinkNextElement().element, current.getLinkNextElement().linkNextElement, current.getLinkNextElement().linkPrevElement);
+		} while (true);
+	}
+	
+	public Book searchBookByTitle(String title) {
+		Book search = null;
+		int counter = 0;
+		if(title!=null) {
+			Node<E> current = firstNode;
+			boolean flag = true;
+			do {
+				if(((Book) current.getElement()).getNameBook().equals(title)) {
+					if(counter<1) {
+						search = (Book) current.getElement();
+					}
+					counter++;
+				}
+				if(current.getLinkNextElement() == null) {
+					flag = false;
+				}
+				if(flag) {
+					current = new Node<E>(current.getLinkNextElement().element, current.getLinkNextElement().linkNextElement, current.getLinkNextElement().linkPrevElement);
+					}
+			} while (flag);
+		}
+		if(counter>1) {
+			System.out.println("There are books with the same name in the list.");
+		}
+		return search;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void insertBookInPosition(Book newBook, Book currentInList) {
+		Node<E> current = firstNode;
+		boolean flag = true;
+		do {
+			if((boolean) current.getElement().equals(currentInList)) {
+				if((boolean) current.getElement().equals(firstNode.getElement())) {
+					System.out.println("first++");
+					addFirst((E) newBook);
+				}
+				if((boolean) current.getElement().equals(lastNode.getElement())) {
+					System.out.println("last++");
+					Node<E> newNode = new Node<E>((E) newBook, lastNode, lastNode.getLinkPrevElement());
+					lastNode.getLinkPrevElement().setLinkNextElement(newNode);
+					lastNode.setLinkPrevElement(newNode);
+					size++;
+				}
+				Node<E> newNode = new Node<E>((E) newBook, current, current.getLinkPrevElement());
+				current.getLinkPrevElement().setLinkNextElement(newNode);
+				current.setLinkPrevElement(newNode);
+				size++;
+				return;
+			}
+			if(current.getLinkNextElement() == null) {
+				flag = false;;
+			}
+			if(flag) {
+				current = new Node<E>(current.getLinkNextElement().element, current.getLinkNextElement().linkNextElement, current.getLinkNextElement().linkPrevElement);
+			}
+		} while (flag);
 	}
 
 }
